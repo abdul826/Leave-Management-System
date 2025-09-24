@@ -15,7 +15,7 @@ exports.addDepartment = async(req,res)=>{
             });
 
             await newDep.save();
-            res.status(200).json("Department added successfully");
+            res.status(200).json(newDep);
         }else{
             res.status(400).json("Filed is required");
         }

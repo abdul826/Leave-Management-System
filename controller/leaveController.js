@@ -2,13 +2,16 @@ const leaveTypeModel = require('../Model/leaveTypeModel');
 const leaveModel = require('../Model/leaveModel.js');
 const {sendEmailToAdmin,sendEmailToEmployee} = require('../helper/sendMail.js');
 const employeeModel = require('../Model/employeeModel.js');
+const indianHolidays = require('../helper/holidays.js');
 
 // Leave
 exports.applyLeave = async(req,res)=>{
     try {
         const empId = req.empId;
-        const {leaveTypeId,leave_from,leave_to,leave_desc,leave_status} = req.body;
+        const {leaveTypeId,leave_from,leave_to,leave_desc} = req.body;
+        
         const files = req.files; 
+        let leave_status = 'Pending';
         let extraLeave = '';
 
         const leaveFrom = new Date(leave_from);
@@ -46,11 +49,12 @@ exports.applyLeave = async(req,res)=>{
 
 
         const documents = files ? files.map(file => file.path):[];
+
         const newLeave = new leaveModel({
             empId,leaveTypeId,leave_from,leave_to,leave_desc,leave_status,documents
 
         });
-        
+        // return
         await newLeave.save();
 
         // Decrement the leave balance from employee table
@@ -69,7 +73,7 @@ exports.applyLeave = async(req,res)=>{
         }
 
         const getLeaveType = await leaveTypeModel.findOne({_id:leaveTypeId});
-
+        
         // Send Mail
         await sendEmailToAdmin({
         subject: "New Leave Application Submitted",
@@ -98,23 +102,36 @@ exports.applyLeave = async(req,res)=>{
 // Fetch All leave - Admin
 exports.fetchAllLeave = async(req,res)=>{
     try {
-        const getAllLeave = await leaveModel.find();
+        const getAllLeave = await leaveModel.find().populate('empId').populate('leaveTypeId');
         if(getAllLeave) return res.status(200).json(getAllLeave);
     } catch (error) {
         return res.status(400).json("Error while Getching leaves");
     }
 }
 
+// Fetch Single leave - Admin
+exports.fetchSingleLeave = async(req,res)=>{
+    try {
+        const getsSingleLeave = await leaveModel.find(req.empId).populate('leaveTypeId');
+        if(getsSingleLeave) return res.status(200).json(getsSingleLeave);
+    } catch (error) {
+        console.log(error);
+        
+        return res.status(400).json("Error while Getching leaves");
+    }
+}
+
+
 // LEave Status Change - Admin
 exports.leaveStatus = async(req,res)=>{
     try {
         const { id } = req.params; // leave ID
         const { status } = req.body; // new status ("Approved" or "Reject")
-        
+
         // Validate status input
-        const validStatuses = ["Approved", "Reject"];
+        const validStatuses = ["Approved", "Rejected"];
         if (!validStatuses.includes(status)) {
-            return res.status(400).json({ message: "Invalid status. Must be 'Approved' or 'Reject'." });
+            return res.status(400).json({ message: "Invalid status. Must be 'Approved' or 'Rejected'." });
         }
 
          // Find the leave request
@@ -207,8 +224,20 @@ exports.deleteLeaveType = async(req,res)=>{
         if(isDepExist === '') return res.status(400).json("leaveTypeModel Not exist");
 
         const deleteDep = await leaveTypeModel.findByIdAndDelete({_id:id});
-        if(deleteDep) return res.status(200).json("leaveTypeModel deleted successfuly");
+        if(deleteDep) return res.status(200).json("leaveType deleted successfuly");
     } catch (error) {
         return res.status(400).json("Error while updating the leaveTypeModel");
+    }
+}
+
+exports.IndianHoliday = async(req,res)=>{
+    try {
+        return res.status(200).json({
+            year: 2025,
+            country: "India",
+            holidays: indianHolidays,
+        });
+    } catch (error) {
+        return res.status(400).json("Error while fetching holidays");
     }
 }

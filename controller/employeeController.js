@@ -70,6 +70,26 @@ exports.verifyEmp = async(req,res)=>{
     }
 }
 
+exports.adminVerifyEmp = async(req,res)=>{
+    try {
+        const verifyAdmin = await empMOdel.findOne({_id:req.empId});
+        if(!verifyAdmin) return res.status(400).json("Employee not verified");
+        return res.status(200).json({message:"Employee Verified",verifyAdmin});
+    } catch (error) {
+        return res.status(400).json("Error while validating the Employee", error);
+    }
+}
+
+exports.fetchAllEmp = async(req,res)=>{
+    try {
+        const getAllEmp = await empMOdel.find().populate('departmentId');
+        if(!getAllEmp) return res.status(400).json("No Employee Found!");
+        return res.status(200).json({message:"Employee Record",getAllEmp});
+    } catch (error) {
+        return res.status(400).json("Error while validating the Employee", error);
+    }
+}
+
 // Update Employee -- admin
 exports.updateEmployee = async(req,res)=>{
     const {id} = req.params;
