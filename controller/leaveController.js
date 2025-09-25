@@ -29,7 +29,7 @@ exports.applyLeave = async(req,res)=>{
             return res.status(400).json("All fileds are required");
         } 
         
-        if (fromDate > toDate) {
+        if (leaveFrom > leaveTo) {
             return res.status(400).json("Leave from date cannot be after leave to date");
         }
 
