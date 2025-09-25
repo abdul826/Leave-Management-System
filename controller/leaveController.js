@@ -29,8 +29,8 @@ exports.applyLeave = async(req,res)=>{
             return res.status(400).json("All fileds are required");
         } 
         
-        if(leave_from >= leave_to){
-            return res.status(400).json("Leave from is less than leave to date");
+        if (fromDate > toDate) {
+            return res.status(400).json("Leave from date cannot be after leave to date");
         }
 
         if (files && files.length > 3) {
