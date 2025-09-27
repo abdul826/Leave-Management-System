@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/register',employeeAuthorization,register);
 router.post('/login',login);
-router.get('/fetchemp',employeeAuthentication,fetchAllEmp);
+router.get('/fetchemp',employeeAuthorization,fetchAllEmp);
 router.get('/verifyEmp',employeeAuthentication,verifyEmp);
 router.get('/adminverifyEmp',employeeAuthorization,adminVerifyEmp);
 router.put('/updatemp',employeeAuthentication,updateEmployee);
