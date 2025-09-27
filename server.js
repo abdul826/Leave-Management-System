@@ -2,6 +2,7 @@ require('dotenv').config();
 require('./helper/employeeLeaveSchedue.js');
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const app = express();
 
 // add DB file
@@ -12,6 +13,9 @@ app.use(cors());
 
 // parses incoming requests with JSON payloads
 app.use(express.json());
+
+// add file path
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Add API URL
 const employeeRoute = require('./Route/employeeRoute.js');
