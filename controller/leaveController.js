@@ -102,7 +102,7 @@ exports.applyLeave = async(req,res)=>{
 // Fetch All leave - Admin
 exports.fetchAllLeave = async(req,res)=>{
     try {
-        const getAllLeave = await leaveModel.find().populate('empId').populate('leaveTypeId');
+        const getAllLeave = await leaveModel.find().sort({ createdAt: -1 }).populate('empId').populate('leaveTypeId');
         if(getAllLeave) return res.status(200).json(getAllLeave);
     } catch (error) {
         return res.status(400).json("Error while Getching leaves");
